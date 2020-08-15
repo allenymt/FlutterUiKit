@@ -1,7 +1,6 @@
 name: flutter_ui_box
 description: flutter Ui tools box. such as address select dialog,date select dialog
 version: 0.0.1
-author:
 homepage: https://github.com/allenyulun/FlutterUiKit
 
 environment:
