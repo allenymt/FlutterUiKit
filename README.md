@@ -16,9 +16,11 @@
 # PreloadPageView
     预加载的pageView，参考了 https://github.com/octomato/preload_page_view
 
-# 再推荐一个监听键盘弹出的插件
+# flutter_keyboard_visibility
+    监听键盘弹出的插件
     github地址： https://github.com/allenyulun/flutter_keyboard_visibility
-    参考了https://github.com/adee42/flutter_keyboard_visibility，在这个库的基础上，针对Android扩展了对混合栈的支持，需要的同学自取
+    在原有库的基础上，针对Android扩展了对混合栈的支持，需要的同学自取
+    参考地址 https://github.com/adee42/flutter_keyboard_visibility，
 
 # demo请见 
     https://github.com/allenyulun/flutter_just_test，对所有的Ui工具都会有演示
