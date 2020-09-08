@@ -51,27 +51,8 @@ import 'package:flutter_ui_kit/flutter_ui_kit.dart';
 
 ## Usage
 
-```日期选择框```
-```dart
- showModalBottomSheet<String>(
-        context: context,
-        // 圆角
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(15.0), topRight: Radius.circular(15.0)),
-        ),
-        // 背景色
-        backgroundColor: Colors.white,
-        builder: (context) {
-          return DateSelectDialog(_date ?? '');
-        }).then((value) async {
-      if (isNotEmpty(value) ) {
-        setState(() {
-          _date = value;
-        });
-      }
-    });
-```
+参考demo库
+https://github.com/allenyulun/flutter_just_test 
 
 ## License
 
