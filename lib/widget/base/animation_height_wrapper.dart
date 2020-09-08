@@ -26,7 +26,7 @@ class AnimationHeightViewWidget<T extends Widget> extends StatefulWidget {
       this.itemCount,
       this.currentPageIndex})
       : assert(pageViewChild != null),
-        assert(computeAspectRadio!=null),
+        assert(computeAspectRadio != null),
         assert(itemCount > 0);
 
   @override
@@ -63,7 +63,8 @@ class _AnimationHeightViewWidgetState extends State<AnimationHeightViewWidget> {
       stream: _headerStream,
       builder: (context, snapshot) {
         return AspectRatio(
-          aspectRatio: snapshot?.data ?? widget.computeAspectRadio(_currentIndex) ?? 1.0,
+          aspectRatio:
+              snapshot?.data ?? widget.computeAspectRadio(_currentIndex) ?? 1.0,
           child: widget.pageViewChild,
         );
       },

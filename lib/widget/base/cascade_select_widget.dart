@@ -195,13 +195,9 @@ class _PickerState<T> extends State<_PickerWidget<T>> {
 
   FixedExtentScrollController _fixedExtentScrollController;
 
-  // 记录当前选中的下标
-  int _currentIndex;
-
   @override
   void initState() {
     super.initState();
-    _currentIndex = initSelectIndex;
     _fixedExtentScrollController =
         FixedExtentScrollController(initialItem: initSelectIndex);
   }
