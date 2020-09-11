@@ -2,6 +2,7 @@ import 'dart:ui' as ui show PlaceholderAlignment;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter_ui_box/flutter_ui_kit.dart';
 
 /// do what
 /// @author yulun
@@ -68,10 +69,8 @@ class _FoldUpTextState extends State<FoldUpTextWidget> {
       ],
     );
 
-    final contentSpan = TextSpan(
-        children: widget.inlineSpanList,
-        text: widget.text,
-        style: widget.textStyle);
+    final contentSpan =
+        TextSpan(children: widget.inlineSpanList, text: widget.text);
 
     Widget result = LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
@@ -135,11 +134,14 @@ class _FoldUpTextState extends State<FoldUpTextWidget> {
     return result;
   }
 
+  ///inlineSpanList 内容的spanlist
+  ///span 实际展示的span
+  ///clipOffset 裁剪的位置
   int _computeClipIndexInSpanList(List<InlineSpan> inlineSpanList,
       InlineSpan span, TextPosition clipOffset) {
     InlineSpan indexSpan = span.getSpanForPosition(clipOffset);
     int index = inlineSpanList.indexOf(indexSpan);
-    return index;
+    return index - 1;
   }
 }
 
@@ -204,7 +206,7 @@ class TextMeasureHelper {
 /// http链接文案构建辅助类
 class LinkUrlTextHelper {
   static RegExp regExp = RegExp(
-      "((http|ftp|https)://)(([a-zA-Z0-9\\._-]+\\.[a-zA-Z]{2,6})|([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}))(:[0-9]{1,4})*(/[a-zA-Z0-9\\&%_\\./-~-]*)*(#[a-zA-Z0-9\\&%_\\./-~-]*)?");
+      "((http|ftp|https)://)(([a-zA-Z0-9\\._-]+\\.[a-zA-Z]{1,3})|([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}))(:[0-9]{1,4})*(/[a-zA-Z0-9\\&%_\\./-~-]*)*(#[a-zA-Z0-9\\&%_\\./-~-]*)?");
 
   static List<InlineSpan> parseHttpLink({
     String content,
@@ -230,15 +232,26 @@ class LinkUrlTextHelper {
         String url = content.substring(
             m.start, m.end > content.length ? content.length : m.end);
 
-        result.add(TextSpan(
-            text: linkUrlConfig.linkText ?? "",
-            recognizer: TapGestureRecognizer()
-              ..onTap = () {
-                if (linkUrlConfig.onLinkTap != null) {
-                  linkUrlConfig.onLinkTap.call(url);
-                }
-              },
-            style: linkUrlConfig.linkStyle));
+        if (linkUrlConfig.enableLinkIcon &&
+            isNotEmpty(linkUrlConfig.linkIconPath)) {
+          result.add(
+            WidgetSpan(
+                child: Image.asset(linkUrlConfig.linkIconPath),
+                alignment: ui.PlaceholderAlignment.middle),
+          );
+        }
+        result.add(
+          TextSpan(
+              text: linkUrlConfig.linkText ?? "",
+              recognizer: TapGestureRecognizer()
+                ..onTap = () {
+                  if (linkUrlConfig.onLinkTap != null) {
+                    linkUrlConfig.onLinkTap.call(url);
+                  }
+                },
+              style: linkUrlConfig.linkStyle),
+        );
+
         index = m.end;
       }
 
@@ -259,6 +272,8 @@ class LinkUrlConfig {
   final Function(String linkUrl) onLinkTap;
   final TextStyle linkStyle;
   final TextStyle contentStyle;
+  final bool enableLinkIcon;
+  final String linkIconPath;
 
   const LinkUrlConfig.defaultConfig(
       {this.linkText = "网页链接",
@@ -270,8 +285,16 @@ class LinkUrlConfig {
       this.contentStyle = const TextStyle(
         color: Color(0xFF333333),
         fontSize: 15,
-      )});
+      ),
+      this.enableLinkIcon = true,
+      this.linkIconPath})
+      : assert(enableLinkIcon && linkIconPath == null);
 
   LinkUrlConfig.config(
-      {this.linkText, this.onLinkTap, this.linkStyle, this.contentStyle});
+      {this.linkText,
+      this.onLinkTap,
+      this.linkStyle,
+      this.contentStyle,
+      this.enableLinkIcon,
+      this.linkIconPath});
 }
