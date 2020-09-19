@@ -4,6 +4,8 @@
     
     v0.0.1 级联选择框，自定义支持日期选择，时间选择，省市级地址选择
     v0.0.2 增加 高度动画变化容器，展开收起控件，预加载pageView 三个UI控件
+    v0.0.3 bug fix
+    v0.0.4 bug fix
     
 # AnimationHeightViewWidget
     自适应高度容器，例如pageview左右滑动时 ，可以让pageview高度自动变化
