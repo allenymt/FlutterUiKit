@@ -70,7 +70,7 @@ class _FoldUpTextState extends State<FoldUpTextWidget> {
     );
 
     final contentSpan =
-        TextSpan(children: widget.inlineSpanList, text: widget.text);
+        TextSpan(children: widget.inlineSpanList, text: widget.text,style: widget.textStyle,);
 
     Widget result = LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
