@@ -5,7 +5,8 @@
     v0.0.1 级联选择框，自定义支持日期选择，时间选择，省市级地址选择
     v0.0.2 增加 高度动画变化容器，展开收起控件，预加载pageView 三个UI控件
     v0.0.3 bug fix
-    v0.0.4 bug fix
+    v0.0.4 bug 正则表达式bug fix
+    v0.0.5 bug 文案样式fix
     
 # AnimationHeightViewWidget
     自适应高度容器，例如pageview左右滑动时 ，可以让pageview高度自动变化
@@ -23,7 +24,7 @@
     监听键盘弹出的插件
     github地址： https://github.com/allenyulun/flutter_keyboard_visibility
     在原有库的基础上，针对Android扩展了对混合栈的支持，需要的同学自取
-    参考地址 https://github.com/adee42/flutter_keyboard_visibility，
+    参考地址 https://github.com/adee42/flutter_keyboard_visibility
 
 # demo请见 
     https://github.com/allenyulun/flutter_just_test，对所有的Ui工具都会有演示
