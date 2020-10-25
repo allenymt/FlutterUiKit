@@ -7,6 +7,7 @@
     v0.0.3 bug fix
     v0.0.4 bug 正则表达式bug fix
     v0.0.5 bug 文案样式fix
+    v0.0.5 bug 展开收起文本 宽度计算问题
     
 # AnimationHeightViewWidget
     自适应高度容器，例如pageview左右滑动时 ，可以让pageview高度自动变化
