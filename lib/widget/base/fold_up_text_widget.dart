@@ -1,8 +1,6 @@
 import 'dart:ui' as ui show PlaceholderAlignment;
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter_ui_box/flutter_ui_kit.dart';
 
 /// do what
 /// @author yulun
@@ -12,23 +10,22 @@ class FoldUpTextWidget extends StatefulWidget {
   final String text;
   final List<InlineSpan> inlineSpanList;
   final int maxLines;
-  final TextSpan Function(bool expand, GestureRecognizer gestureRecognizer)
-      buildSpan;
+  final TextSpan Function(bool expand, GestureRecognizer gestureRecognizer,
+      [TextStyle textStyle]) buildSpan;
   final TextStyle textStyle;
   final bool expanded;
 
   //这里有个官方Bug，测量时触发WidgetSpan的build方法，有个assert判断PlaceholderDimensions不为空，但实际上对测量和渲染无影响
   final int widgetSpanCount;
 
-  FoldUpTextWidget(
-      {Key key,
-      this.text,
-      this.inlineSpanList,
-      @required this.maxLines,
-      this.expanded = false,
-      this.textStyle,
-      @required this.buildSpan,
-      this.widgetSpanCount = 0})
+  FoldUpTextWidget({Key key,
+    this.text,
+    this.inlineSpanList,
+    @required this.maxLines,
+    this.expanded = false,
+    this.textStyle,
+    this.buildSpan = _defaultSpanBuilder,
+    this.widgetSpanCount = 0})
       : assert(maxLines != null),
         assert(buildSpan != null),
         assert(text != null || inlineSpanList != null),
@@ -37,6 +34,38 @@ class FoldUpTextWidget extends StatefulWidget {
   @override
   State<FoldUpTextWidget> createState() {
     return _FoldUpTextState();
+  }
+
+  static TextSpan _defaultSpanBuilder(bool expand,
+      GestureRecognizer gestureRecognizer,
+      [TextStyle textStyle]) {
+    if (expand) {
+      return TextSpan(children: [
+        TextSpan(
+          recognizer: gestureRecognizer,
+          text: "  收起",
+          style: TextStyle(
+              color: Color(0xFF4A90E2),
+              fontSize: textStyle?.fontSize ?? 13,
+              fontWeight: textStyle?.fontWeight ?? FontWeight.w500),
+        ),
+      ]);
+    } else {
+      return TextSpan(children: [
+        TextSpan(
+          text: '...',
+          style: textStyle,
+        ),
+        TextSpan(
+          text: "  展开",
+          recognizer: gestureRecognizer,
+          style: TextStyle(
+              color: Color(0xFF4A90E2),
+              fontSize: textStyle?.fontSize ?? 13,
+              fontWeight: textStyle?.fontWeight ?? FontWeight.w500),
+        ),
+      ]);
+    }
   }
 }
 
@@ -48,7 +77,8 @@ class _FoldUpTextState extends State<FoldUpTextWidget> {
   void initState() {
     super.initState();
     _expanded = widget.expanded;
-    _tapGestureRecognizer = TapGestureRecognizer()..onTap = _toggleExpanded;
+    _tapGestureRecognizer = TapGestureRecognizer()
+      ..onTap = _toggleExpanded;
   }
 
   @override
@@ -65,12 +95,15 @@ class _FoldUpTextState extends State<FoldUpTextWidget> {
   Widget build(BuildContext context) {
     final link = TextSpan(
       children: <TextSpan>[
-        widget.buildSpan(_expanded, _tapGestureRecognizer),
+        widget.buildSpan(_expanded, _tapGestureRecognizer, widget.textStyle),
       ],
     );
 
-    final contentSpan =
-        TextSpan(children: widget.inlineSpanList, text: widget.text,style: widget.textStyle,);
+    final contentSpan = TextSpan(
+      children: widget.inlineSpanList,
+      text: widget.text,
+      style: widget.textStyle,
+    );
 
     Widget result = LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
@@ -86,7 +119,9 @@ class _FoldUpTextState extends State<FoldUpTextWidget> {
           maxLines: widget.maxLines,
           bFindWidgetSpanCount: true,
         );
-        final linkWidth = linkTextPainter.width;
+
+        /// 预留1个icon的宽度
+        final linkWidth = linkTextPainter.width + 6;
 
         //测量实际文案
         TextPainter contentTextPainter = TextMeasureHelper.measure(
@@ -113,11 +148,9 @@ class _FoldUpTextState extends State<FoldUpTextWidget> {
             children: []
               ..addAll(_expanded
                   ? (widget.inlineSpanList ?? [])
-                  : (widget.inlineSpanList?.sublist(
-                          0,
-                          _computeClipIndexInSpanList(
-                              widget.inlineSpanList, contentSpan, position)) ??
-                      []))
+                  : _computeClipIndexInSpanList(
+                  widget.inlineSpanList ?? [], contentSpan, position) ??
+                  [])
               ..add(link),
           );
         } else {
@@ -137,11 +170,37 @@ class _FoldUpTextState extends State<FoldUpTextWidget> {
   ///inlineSpanList 内容的spanlist
   ///span 实际展示的span
   ///clipOffset 裁剪的位置
-  int _computeClipIndexInSpanList(List<InlineSpan> inlineSpanList,
+  List<InlineSpan> _computeClipIndexInSpanList(List<InlineSpan> inlineSpanList,
       InlineSpan span, TextPosition clipOffset) {
+    List<InlineSpan> newInlineSpanList = []..addAll(inlineSpanList);
     InlineSpan indexSpan = span.getSpanForPosition(clipOffset);
     int index = inlineSpanList.indexOf(indexSpan);
-    return index - 1;
+
+    double prePosition = 0;
+    for (int startIndex = 0; startIndex < index; startIndex++) {
+      prePosition = prePosition +
+          TextMeasureHelper.computeWidgetSpanWidth(inlineSpanList[startIndex]);
+    }
+
+    try {
+      if (indexSpan is TextSpan) {
+        TextSpan txtSpan = indexSpan;
+        String newText =
+        txtSpan.text.substring(0, clipOffset.offset - prePosition.floor());
+        TextSpan newTxtSpan = TextSpan(
+          text: newText,
+          children: txtSpan.children,
+          style: txtSpan.style,
+          recognizer: txtSpan.recognizer,
+          semanticsLabel: txtSpan.semanticsLabel,
+        );
+        newInlineSpanList[index] = newTxtSpan;
+      }
+    } catch (e) {
+      print(e);
+    }
+
+    return newInlineSpanList.sublist(0, index + 1);
   }
 }
 
@@ -166,14 +225,7 @@ class TextMeasureHelper {
 
     //这里有个官方Bug，测量时触发WidgetSpan的build方法，有个assert判断PlaceholderDimensions不为空，但实际上对测量和渲染无影响
     if (bFindWidgetSpanCount && widgetSpanCount <= 0) {
-      widgetSpanCount = findWidgetSpanCount(span).value;
-    }
-    if ((widgetSpanCount ?? 0) > 0) {
-      List<PlaceholderDimensions> value = [];
-      for (int i = 0; i < widgetSpanCount; i++) {
-        value.add(PlaceholderDimensions(
-            size: Size(1, 1), alignment: ui.PlaceholderAlignment.top));
-      }
+      List<PlaceholderDimensions> value = buildWidgetSpanPlaceHolder(span);
       textPainter.setPlaceholderDimensions(value);
     }
     textPainter.layout(minWidth: minWidth, maxWidth: maxWidth);
@@ -181,25 +233,60 @@ class TextMeasureHelper {
   }
 
   /// 查找span中WidgetSpan的数量
-  static Accumulator findWidgetSpanCount(InlineSpan span,
-      {Accumulator offset}) {
-    if (offset == null) {
-      offset = Accumulator();
+  static List<PlaceholderDimensions> buildWidgetSpanPlaceHolder(InlineSpan span,
+      {List<PlaceholderDimensions> values}) {
+    if (values == null) {
+      values = List();
     }
     if (span == null) {
-      return offset;
+      return values;
     }
     if (span is TextSpan) {
       if (span.children != null) {
         for (InlineSpan child in span.children) {
-          offset = findWidgetSpanCount(child, offset: offset);
+          values = buildWidgetSpanPlaceHolder(child, values: values);
         }
       }
-    } else if (span is WidgetSpan) {
-      offset.increment(1);
-      return offset;
     }
-    return offset;
+    else if (span is SizedWidgetSpan) {
+      values.add(PlaceholderDimensions(
+          size: Size(span.width ?? 1, span.height ?? 1),
+          alignment: ui.PlaceholderAlignment.top));
+      return values;
+    }
+    else if (span is WidgetSpan) {
+      values.add(PlaceholderDimensions(
+          size: Size(1, 1), alignment: ui.PlaceholderAlignment.top));
+      return values;
+    }
+    return values;
+  }
+
+  static double computeWidgetSpanWidth(InlineSpan span, {double width}) {
+    if (width == null) {
+      width = 0;
+    }
+    if (span == null) {
+      return width;
+    }
+    if (span is TextSpan) {
+      if (span.text != null) {
+        width = width + span.text?.runes?.length ?? 0;
+      }
+      if (span.children != null) {
+        for (InlineSpan child in span.children) {
+          width = width + computeWidgetSpanWidth(child, width: width);
+        }
+      }
+    }
+//    else if (span is VdWidgetSpan) {
+//      width = width + span.width ?? 1;
+//      return width;
+//    }
+    else if (span is WidgetSpan) {
+      width = width + 1;
+    }
+    return width;
   }
 }
 
@@ -232,11 +319,11 @@ class LinkUrlTextHelper {
         String url = content.substring(
             m.start, m.end > content.length ? content.length : m.end);
 
-        if (linkUrlConfig.enableLinkIcon &&
-            isNotEmpty(linkUrlConfig.linkIconPath)) {
+        if (linkUrlConfig.enableLinkIcon) {
           result.add(
             WidgetSpan(
-                child: Image.asset(linkUrlConfig.linkIconPath),
+                child: Image.asset(
+                    linkUrlConfig.linkIconPath),
                 alignment: ui.PlaceholderAlignment.middle),
           );
         }
@@ -275,26 +362,42 @@ class LinkUrlConfig {
   final bool enableLinkIcon;
   final String linkIconPath;
 
-  const LinkUrlConfig.defaultConfig(
-      {this.linkText = "网页链接",
-      this.onLinkTap,
-      this.linkStyle = const TextStyle(
-        color: Color(0xFF199AED),
-        fontSize: 15,
-      ),
-      this.contentStyle = const TextStyle(
-        color: Color(0xFF333333),
-        fontSize: 15,
-      ),
-      this.enableLinkIcon = true,
-      this.linkIconPath})
-      : assert(enableLinkIcon && linkIconPath == null);
+  const LinkUrlConfig.defaultConfig({this.linkText = "网页链接",
+    this.onLinkTap,
+    this.linkStyle = const TextStyle(
+      color: Color(0xFF199AED),
+      fontSize: 15,
+    ),
+    this.contentStyle = const TextStyle(
+      color: Color(0xFF333333),
+      fontSize: 15,
+    ),
+    this.enableLinkIcon = true,
+    this.linkIconPath});
 
-  LinkUrlConfig.config(
-      {this.linkText,
-      this.onLinkTap,
-      this.linkStyle,
-      this.contentStyle,
-      this.enableLinkIcon,
-      this.linkIconPath});
+  LinkUrlConfig.config({this.linkText,
+    this.onLinkTap,
+    this.linkStyle,
+    this.contentStyle,
+    this.enableLinkIcon,
+    this.linkIconPath});
+}
+
+/// WidgetSpan 宽高需要build后才能计算
+class SizedWidgetSpan extends WidgetSpan {
+  final double width;
+  final double height;
+
+  SizedWidgetSpan({
+    this.width,
+    this.height,
+    @required Widget child,
+    ui.PlaceholderAlignment alignment = ui.PlaceholderAlignment.bottom,
+    TextBaseline baseline,
+    TextStyle style,
+  }) : super(
+      child: child,
+      alignment: alignment,
+      baseline: baseline,
+      style: style);
 }
