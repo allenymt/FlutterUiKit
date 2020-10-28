@@ -10,6 +10,11 @@
 # PreloadPageView
     预加载的pageView，参考了 https://github.com/octomato/preload_page_view
 
+# BottomDialogWrapper
+    系统的showModalBottomSheet 和 Scaffold下BottomSheet的替代品
+    支持更多的自定义参数，支持列表拖动关闭
+    混合开发下的底部弹框
+
 # 再推荐一个监听键盘弹出的插件
     github地址： https://github.com/allenyulun/flutter_keyboard_visibility
     参考了https://github.com/adee42/flutter_keyboard_visibility，在这个库的基础上，针对Android扩展了对混合栈的支持，需要的同学自取

@@ -2,13 +2,6 @@
 
 个人flutter ui 工具盒.
     
-    v0.0.1 级联选择框，自定义支持日期选择，时间选择，省市级地址选择
-    v0.0.2 增加 高度动画变化容器，展开收起控件，预加载pageView 三个UI控件
-    v0.0.3 bug fix
-    v0.0.4 bug 正则表达式bug fix
-    v0.0.5 bug 文案样式fix
-    v0.0.5 bug 展开收起文本 宽度计算问题
-    
 # AnimationHeightViewWidget
     自适应高度容器，例如pageview左右滑动时 ，可以让pageview高度自动变化
     
@@ -21,6 +14,11 @@
 # PreloadPageView
     预加载的pageView，参考了 https://github.com/octomato/preload_page_view
 
+# BottomDialogWrapper
+    系统的showModalBottomSheet 和 Scaffold下BottomSheet的替代品
+    支持更多的自定义参数，支持列表拖动关闭
+    混合开发下的底部弹框
+
 # flutter_keyboard_visibility
     监听键盘弹出的插件
     github地址： https://github.com/allenyulun/flutter_keyboard_visibility
@@ -28,7 +26,7 @@
     参考地址 https://github.com/adee42/flutter_keyboard_visibility
 
 # demo请见 
-    https://github.com/allenyulun/flutter_just_test，对所有的Ui工具都会有演示
+    example 里有demo
     
 ## Getting Started
 
