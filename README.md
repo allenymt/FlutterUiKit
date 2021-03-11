@@ -1,6 +1,6 @@
 # FlutterUiKit
 
-个人flutter ui 工具盒.
+flutter ui 工具盒.
     
 # AnimationHeightViewWidget
     自适应高度容器，例如pageview左右滑动时 ，可以让pageview高度自动变化
