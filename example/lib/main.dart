@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_ui_box/flutter_ui_kit.dart';
 
 import 'ui/animation_pageview_demo.dart';
 import 'ui/bottom_dialog_test.dart';
@@ -95,6 +94,37 @@ class _WidgetDemoPageListState extends State<WidgetDemoPageList> {
               }));
             },
           ),
+          ListTile(
+            title: Text('折叠文本demo'),
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                return Scaffold(
+                  body: Center(
+                      child: GestureDetector(
+                    onTap: () {
+                      print('tab parent');
+                    },
+                    child: Container(
+                      width: 100,
+                      height: 100,
+                      color: Colors.red,
+                      alignment: Alignment.center,
+                      child: GestureDetector(
+                        onTap: () {
+                          print('tab child');
+                        },
+                        child: Container(
+                          width: 50,
+                          height: 50,
+                          color: Colors.green,
+                        ),
+                      ),
+                    ),
+                  )),
+                );
+              }));
+            },
+          ),
         ],
       ),
     );
@@ -137,5 +167,4 @@ class DialogRoute extends PopupRoute {
       Animation<double> secondaryAnimation) {
     return builder(context);
   }
-
 }
