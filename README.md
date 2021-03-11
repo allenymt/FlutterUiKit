@@ -54,6 +54,7 @@ import 'package:flutter_ui_kit/flutter_ui_kit.dart';
 ## Usage
 pub地址
 https://pub.dev/packages/flutter_ui_box
+
 参考demo库
 https://github.com/allenyulun/flutter_just_test 
 
