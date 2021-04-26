@@ -8,3 +8,4 @@ export 'widget/base/fold_up_text_widget.dart';
 export 'widget/base/preload_pageview.dart';
 export 'widget/base/bottom_dialog_wrapper.dart';
 export 'widget/base/over_scroll_behavior.dart';
+export 'widget/base/infinite_pageview.dart';

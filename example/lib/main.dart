@@ -5,6 +5,7 @@ import 'ui/bottom_dialog_test.dart';
 import 'ui/cascade_pick_demo.dart';
 import 'ui/data_select_dialog.dart';
 import 'ui/fold_up_demo.dart';
+import 'ui/infinite_pageview_demo.dart';
 import 'ui/prelaod_pageview_demo.dart';
 
 void main() {
@@ -122,6 +123,15 @@ class _WidgetDemoPageListState extends State<WidgetDemoPageList> {
                     ),
                   )),
                 );
+              }));
+            },
+          ),
+
+          ListTile(
+            title: Text('无限轮播-自动轮播-PageView demo'),
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                return InfinitePageViewDemo();
               }));
             },
           ),

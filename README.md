@@ -25,6 +25,10 @@ flutter ui 工具盒.
     在原有库的基础上，针对Android扩展了对混合栈的支持，需要的同学自取
     参考地址 https://github.com/adee42/flutter_keyboard_visibility
 
+# InfinitePageView
+    增加无限轮播-自动轮播 pageView
+    区别于其他主流方案，page个数不会无限增长，优化轮询切换时闪动问题
+    
 # demo请见 
     example 里有demo
     
@@ -42,7 +46,7 @@ samples, guidance on mobile development, and a full API reference.
 ## Installation
 ```yaml
 dependencies:
-  flutter_ui_box: ^0.0.1
+  flutter_ui_box: ^0.0.8
 ```
 
 ### Import
