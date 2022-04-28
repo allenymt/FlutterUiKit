@@ -64,7 +64,7 @@ class _BottomDialogDemoState extends State<BottomDialogDemo> {
           children: <Widget>[
             GestureDetector(
               onTap: () {
-                BottomDialogWrapper.of(context).popSelf("我取消了");
+                BottomDialogWrapper.of(context)!.popSelf("我取消了");
               },
               child: Text(
                 "取消",

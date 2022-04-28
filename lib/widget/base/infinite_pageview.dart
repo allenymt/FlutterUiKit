@@ -22,10 +22,10 @@ class InfinitePageView extends StatefulWidget {
   final Widget Function(BuildContext context, int index) buildItem;
 
   /// 页面切换
-  final void Function(int pageIdnex) onPageChange;
+  final void Function(int pageIdnex)? onPageChange;
 
   /// 控制器监听器
-  final void Function(PageController controller) onControllerListener;
+  final void Function(PageController controller)? onControllerListener;
 
   /// 支持自动轮播 默认false
   final bool autoScroll;
@@ -54,8 +54,8 @@ class InfinitePageView extends StatefulWidget {
   final int countMultiple;
 
   InfinitePageView({
-    @required this.count,
-    @required this.buildItem,
+    required this.count,
+    required this.buildItem,
     this.viewportFraction = 1.0,
     this.padEnds = true,
     this.onPageChange,
@@ -74,7 +74,7 @@ class InfinitePageView extends StatefulWidget {
     return InfinitePageViewState();
   }
 
-  static InfinitePageViewState of(BuildContext context) {
+  static InfinitePageViewState? of(BuildContext context) {
     return context.findAncestorStateOfType<InfinitePageViewState>();
   }
 }
@@ -98,21 +98,21 @@ class InfinitePageViewState extends State<InfinitePageView> with WidgetsBindingO
 
   Function get buildItem => widget.buildItem;
 
-  Function get onPageChange => widget.onPageChange;
+  Function? get onPageChange => widget.onPageChange;
 
-  Function get onControllerListener => widget.onControllerListener;
+  Function? get onControllerListener => widget.onControllerListener;
 
   double get viewportFraction => widget.viewportFraction;
 
   bool get padEnds => widget.padEnds;
 
   /// 自动播放控制器
-  Timer _autoPlayTimer;
+  Timer? _autoPlayTimer;
 
-  PageController _pageController;
+  PageController? _pageController;
 
   /// 实际的index
-  int _innerPageIndex;
+  late int _innerPageIndex;
 
   /// false 说明没有手动滑动过，触发自动滚动
   /// true 手势滚动过了
@@ -125,7 +125,7 @@ class InfinitePageViewState extends State<InfinitePageView> with WidgetsBindingO
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance!.addObserver(this);
     _isActive = true;
     startAutoPlay();
     _innerPageIndex = cycleRolling ? widget.initIndex + 1 : widget.initIndex;
@@ -133,9 +133,9 @@ class InfinitePageViewState extends State<InfinitePageView> with WidgetsBindingO
       initialPage: _innerPageIndex,
       viewportFraction: viewportFraction,
     );
-    _pageController.addListener(() {
+    _pageController!.addListener(() {
       if (onControllerListener != null) {
-        onControllerListener(_pageController);
+        onControllerListener!(_pageController);
       }
     });
   }
@@ -149,13 +149,13 @@ class InfinitePageViewState extends State<InfinitePageView> with WidgetsBindingO
         _doChangePageIndex(index);
       },
       itemBuilder: (context, index) {
-        Widget child = buildItem(context, _parseShowIndex(index));
+        Widget? child = buildItem(context, _parseShowIndex(index));
         bool debug = false;
         assert(debug = true);
         if (debug) {
           child = Stack(
             children: [
-              Positioned.fill(child: child),
+              Positioned.fill(child: child!),
               Positioned(
                   left: 0,
                   top: 10,
@@ -166,7 +166,7 @@ class InfinitePageViewState extends State<InfinitePageView> with WidgetsBindingO
             ],
           );
         }
-        return child;
+        return child!;
       },
     );
 
@@ -185,7 +185,7 @@ class InfinitePageViewState extends State<InfinitePageView> with WidgetsBindingO
 
     child = NotificationListener(
       child: child,
-      onNotification: (notification) {
+      onNotification: (dynamic notification) {
         this._handleScrollNotification(notification);
         return true;
       },
@@ -212,12 +212,12 @@ class InfinitePageViewState extends State<InfinitePageView> with WidgetsBindingO
   void dispose() {
     _pageController?.dispose();
     cancelAutoPlay();
-    WidgetsBinding.instance.removeObserver(this);
+    WidgetsBinding.instance!.removeObserver(this);
     super.dispose();
   }
 
   /// 当前是否处于活跃态
-  bool _isActive;
+  late bool _isActive;
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -235,12 +235,12 @@ class InfinitePageViewState extends State<InfinitePageView> with WidgetsBindingO
 
   void startAutoPlay() {
     if (!widget.autoScroll) return;
-    if ((itemCount ?? 0) <= 1) return;
+    if (itemCount <= 1) return;
     //参考RestartableTimer的写法
     if (_autoPlayTimer == null && cycleRolling) {
-      SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+      SchedulerBinding.instance!.addPostFrameCallback((timeStamp) {
         _autoPlayTimer = Timer.periodic(
-            Duration(seconds: widget?.autoPlaySeconds ?? delayPlaySeconds),
+            Duration(seconds: widget.autoPlaySeconds),
             (timer) {
               /// 只有一个像素时，不开启自动轮播
           if (itemCount <= 1) {
@@ -275,16 +275,16 @@ class InfinitePageViewState extends State<InfinitePageView> with WidgetsBindingO
 
     _innerPageIndex++;
     _innerPageIndex = _innerPageIndex % innerPageCount;
-    Duration duration = widget?.animateDuration ?? kTabScrollDuration;
+    Duration duration = widget.animateDuration;
     debugLog("autoMoveToNextIndex $_innerPageIndex");
     if (_innerPageIndex == 0) {
-      this._pageController.jumpToPage(_innerPageIndex + 1);
-      SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+      this._pageController!.jumpToPage(_innerPageIndex + 1);
+      SchedulerBinding.instance!.addPostFrameCallback((timeStamp) {
         autoMoveToNextIndex();
         setState(() {});
       });
     } else {
-      this._pageController.animateToPage(_innerPageIndex,
+      this._pageController!.animateToPage(_innerPageIndex,
           duration: duration, curve: Curves.easeInOut);
     }
   }
@@ -295,7 +295,7 @@ class InfinitePageViewState extends State<InfinitePageView> with WidgetsBindingO
     }
     this._innerPageIndex = _innerPageIndex;
     if (onPageChange != null) {
-      onPageChange(_parseShowIndex(_innerPageIndex));
+      onPageChange!(_parseShowIndex(_innerPageIndex));
     }
   }
 
@@ -334,8 +334,8 @@ class InfinitePageViewState extends State<InfinitePageView> with WidgetsBindingO
   void _handleUserScroll(UserScrollNotification notification) {
     UserScrollNotification sn = notification;
     // print('$Tag, #########   _handleUserScroll');
-    PageMetrics pm = sn.metrics;
-    var page = pm.page;
+    PageMetrics pm = sn.metrics as PageMetrics;
+    var page = pm.page!;
     var depth = sn.depth;
 
     // pageView本身滑动到最左 或者 最右
@@ -356,13 +356,13 @@ class InfinitePageViewState extends State<InfinitePageView> with WidgetsBindingO
     }
     try {
       if (_innerPageIndex == 0) {
-        this._pageController.jumpToPage(innerPageCount - 2);
+        this._pageController!.jumpToPage(innerPageCount - 2);
       } else if (this._innerPageIndex == innerPageCount - 1) {
-        this._pageController.jumpToPage(1);
+        this._pageController!.jumpToPage(1);
       }
       setState(() {});
     } catch (e) {
-      debugLog('$Tag, Exception: ${e?.toString()}');
+      debugLog('$Tag, Exception: ${e.toString()}');
     }
   }
 

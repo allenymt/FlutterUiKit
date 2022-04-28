@@ -15,7 +15,7 @@ typedef PickResultCallback<T>(List<T> result);
 /// currentSelectIndex 当前选中的index,和rowIndex不一定相等的
 /// 当前的数据
 typedef Widget BuildItem<T>(
-    int columnIndex, int buildIndex , T data);
+    int? columnIndex, int buildIndex , T data);
 
 /// 级联选择框
 // ignore: must_be_immutable
@@ -28,25 +28,25 @@ class CascadeSelectWidget<T> extends StatefulWidget {
       buildPickData;
 
   /// 结果回调
-  final PickResultCallback<T> resultCallback;
+  final PickResultCallback<T>? resultCallback;
 
   /// 子item构造
   final BuildItem<T> buildItem;
 
   /// 每列初始化的位置
-  final List<int> initIndex;
+  final List<int>? initIndex;
 
   /// 样式定制
-  PickerStyle pickerStyle;
+  PickerStyle? pickerStyle;
 
   CascadeSelectWidget(
-      {Key key,
-      @required this.columnNum,
-      @required this.buildPickData,
+      {Key? key,
+      required this.columnNum,
+      required this.buildPickData,
       this.resultCallback,
-      @required this.buildItem,
+      required this.buildItem,
       this.initIndex,
-      PickerStyle pickerStyle})
+      PickerStyle? pickerStyle})
       : assert(columnNum != null),
         assert(buildPickData != null),
         assert(buildItem != null),
@@ -73,7 +73,7 @@ class _CascadeSelectState<T> extends State<CascadeSelectWidget<T>> {
     super.initState();
     if (widget.initIndex?.isNotEmpty ?? false) {
       _currentColumnSelectIndex = [];
-      _currentColumnSelectIndex.addAll(widget.initIndex);
+      _currentColumnSelectIndex.addAll(widget.initIndex!);
     } else {
       _currentColumnSelectIndex = List.filled(widget.columnNum + 1, 0);
     }
@@ -87,9 +87,9 @@ class _CascadeSelectState<T> extends State<CascadeSelectWidget<T>> {
 
   @override
   Widget build(BuildContext context) {
-    if (showData?.isEmpty ?? false) return Container();
+    if (showData.isEmpty ) return Container();
 
-    List<Widget> children = List();
+    List<Widget> children = [];
     for (int index = 0; index < widget.columnNum; index++) {
       children.add(_buildColumnWidget(index));
     }
@@ -116,22 +116,22 @@ class _CascadeSelectState<T> extends State<CascadeSelectWidget<T>> {
   /// 单列widget
   Widget _buildColumnWidget(int columnIndex) {
     int len = showData[columnIndex]?.length ?? 0;
-    int initItem = (_currentColumnSelectIndex[columnIndex] ?? 0) >= len
+    int initItem = (_currentColumnSelectIndex[columnIndex]) >= len
         ? (len - 1)
-        : (_currentColumnSelectIndex[columnIndex] ?? 0);
+        : (_currentColumnSelectIndex[columnIndex]);
     if (initItem < 0) initItem = 0;
     List<T> pickData = showData[columnIndex] ?? [];
     return _PickerWidget<T>(
-        key: ValueKey((pickData?.isNotEmpty ?? false)
-            ? "${pickData?.elementAt(0)?.hashCode}_$columnIndex"
-            : columnIndex?.toString()),
+        key: ValueKey((pickData.isNotEmpty)
+            ? "${pickData.elementAt(0).hashCode}_$columnIndex"
+            : columnIndex.toString()),
         columnIndex: columnIndex,
         data: showData[columnIndex] ?? [],
         initSelectIndex: initItem,
         buildItem: widget.buildItem,
         pickerStyle: widget.pickerStyle,
         notifyResult: (columnIndex, selectIndex) async {
-          _currentColumnSelectIndex[columnIndex] = selectIndex;
+          _currentColumnSelectIndex[columnIndex ?? 0] = selectIndex;
           if (columnIndex != widget.columnNum - 1) {
             await _refreshData();
           }
@@ -141,31 +141,31 @@ class _CascadeSelectState<T> extends State<CascadeSelectWidget<T>> {
 
   /// 结果回调
   void notifyResult() async {
-    List<T> resultList = List();
+    List<T> resultList = [];
     showData.forEach((key, value) {
-      int selectItem = _currentColumnSelectIndex[key] ?? 0;
-      if ((value?.isNotEmpty ?? false) && value.length > selectItem)
+      int selectItem = _currentColumnSelectIndex[key];
+      if ((value.isNotEmpty) && value.length > selectItem)
         resultList.add(value.elementAt(selectItem));
     });
-    widget?.resultCallback(resultList);
+    widget.resultCallback!(resultList);
   }
 }
 
 /// 单列选择器
 class _PickerWidget<T> extends StatefulWidget {
-  final int columnIndex;
-  final List<T> data;
-  final int initSelectIndex;
+  final int? columnIndex;
+  final List<T>? data;
+  final int? initSelectIndex;
   final BuildItem<T> buildItem;
-  final Function(int columnIndex, int selectIndex) notifyResult;
-  final PickerStyle pickerStyle;
+  final Function(int? columnIndex, int selectIndex)? notifyResult;
+  final PickerStyle? pickerStyle;
 
   _PickerWidget(
-      {Key key,
+      {Key? key,
       this.columnIndex,
       this.data,
       this.initSelectIndex,
-      this.buildItem,
+      required this.buildItem,
       this.pickerStyle,
       this.notifyResult})
       : assert(buildItem != null),
@@ -178,28 +178,28 @@ class _PickerWidget<T> extends StatefulWidget {
 }
 
 class _PickerState<T> extends State<_PickerWidget<T>> {
-  int get columnIndex => widget.columnIndex;
+  int? get columnIndex => widget.columnIndex;
 
-  List<T> get data => widget.data;
+  List<T>? get data => widget.data;
 
-  int get initSelectIndex => widget.initSelectIndex;
+  int? get initSelectIndex => widget.initSelectIndex;
 
   BuildItem<T> get buildItem => widget.buildItem;
 
-  Function(int columnIndex, int selectIndex) get notifyResult =>
+  Function(int? columnIndex, int selectIndex)? get notifyResult =>
       widget.notifyResult;
 
-  Color get bgColor => widget.pickerStyle?.bgColor;
+  Color? get bgColor => widget.pickerStyle?.bgColor;
 
-  double get itemExtent => widget.pickerStyle?.itemExtent;
+  double? get itemExtent => widget.pickerStyle?.itemExtent;
 
-  FixedExtentScrollController _fixedExtentScrollController;
+  FixedExtentScrollController? _fixedExtentScrollController;
 
   @override
   void initState() {
     super.initState();
     _fixedExtentScrollController =
-        FixedExtentScrollController(initialItem: initSelectIndex);
+        FixedExtentScrollController(initialItem: initSelectIndex!);
   }
 
   @override
@@ -223,22 +223,22 @@ class _PickerState<T> extends State<_PickerWidget<T>> {
       child: CupertinoPicker.builder(
         key: ValueKey(data?.length ?? 0),
         backgroundColor: bgColor,
-        diameterRatio: widget.pickerStyle.diameterRatio,
-        squeeze: widget.pickerStyle.squeeze,
-        magnification: widget.pickerStyle.magnification,
-        useMagnifier: widget.pickerStyle.useMagnifier,
-        offAxisFraction: widget.pickerStyle.offAxisFraction,
-        itemExtent: itemExtent,
+        diameterRatio: widget.pickerStyle!.diameterRatio!,
+        squeeze: widget.pickerStyle!.squeeze!,
+        magnification: widget.pickerStyle!.magnification!,
+        useMagnifier: widget.pickerStyle!.useMagnifier!,
+        offAxisFraction: widget.pickerStyle!.offAxisFraction!,
+        itemExtent: itemExtent!,
         scrollController: _fixedExtentScrollController,
-        childCount: data.length,
+        childCount: data!.length,
         itemBuilder: (context, index) {
           return Container(
               alignment: Alignment.center,
               child: buildItem(
-                  columnIndex, index, data.elementAt(index)));
+                  columnIndex, index, data!.elementAt(index)));
         },
         onSelectedItemChanged: (index) {
-          notifyResult(columnIndex, index);
+          notifyResult!(columnIndex, index);
         },
       ),
     );
@@ -248,25 +248,25 @@ class _PickerState<T> extends State<_PickerWidget<T>> {
 /// 选择框style
 class PickerStyle {
   /// 直径比，把滚轮理解成1个圆，越大，边缘处越清晰,越小，单例滚筒越有曲面的感觉
-  double diameterRatio;
+  double? diameterRatio;
 
   /// 拥挤度，越大越拥挤
-  double squeeze;
+  double? squeeze;
 
   /// 选中态的放大率
-  double magnification;
+  double? magnification;
 
   /// 横向偏移值，左右摇摆
-  double offAxisFraction;
+  double? offAxisFraction;
 
   /// 是否使用放大镜
-  bool useMagnifier;
+  bool? useMagnifier;
 
   /// 背景色
-  Color bgColor;
+  Color? bgColor;
 
   /// 行高
-  double itemExtent;
+  double? itemExtent;
 
   PickerStyle(
       {this.diameterRatio,

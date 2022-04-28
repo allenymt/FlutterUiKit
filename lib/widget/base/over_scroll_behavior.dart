@@ -24,6 +24,6 @@ class OverScrollBehavior extends ScrollBehavior {
       default:
         break;
     }
-    return null;
+    return child;
   }
 }

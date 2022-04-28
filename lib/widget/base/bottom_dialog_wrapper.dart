@@ -11,10 +11,10 @@ class BottomDialogWrapper<T extends Object> extends StatefulWidget {
   final Color barrierColor;
 
   ///底部弹框child
-  final Widget child;
+  final Widget? child;
 
   /// 另一种方式 暴露context构建child ,推荐这种方式
-  final WidgetBuilder buildChild;
+  final WidgetBuilder? buildChild;
 
   /// 动画执行时长
   final int duration;
@@ -25,7 +25,7 @@ class BottomDialogWrapper<T extends Object> extends StatefulWidget {
   final double transformHeight;
 
   /// 点击空白处 消失对话框，可以在这里自定义返回值
-  final T Function() exitCallBack;
+  final T Function()? exitCallBack;
 
   /// 是否启用滑动关闭
   final bool enableDrag;
@@ -48,10 +48,10 @@ class BottomDialogWrapper<T extends Object> extends StatefulWidget {
   State createState() => _BottomDialogWrapperState<T>();
 
   /// 获取 _BottomDialogWrapperState
-  static _BottomDialogWrapperState of(BuildContext context) {
+  static _BottomDialogWrapperState? of(BuildContext context) {
     if (context.widget is BottomDialogWrapper)
-      return (context as StatefulElement).state;
-    final _BottomDialogWrapperState state =
+      return (context as StatefulElement).state as _BottomDialogWrapperState<dynamic>?;
+    final _BottomDialogWrapperState? state =
         context.findAncestorStateOfType<_BottomDialogWrapperState>();
     return state;
   }
@@ -59,11 +59,11 @@ class BottomDialogWrapper<T extends Object> extends StatefulWidget {
 
 class _BottomDialogWrapperState<T> extends State<BottomDialogWrapper>
     with SingleTickerProviderStateMixin {
-  AnimationController _animationController;
+  AnimationController? _animationController;
 
-  AnimationController get animationController => _animationController;
+  AnimationController? get animationController => _animationController;
 
-  Animation _animation;
+  late Animation _animation;
 
   @override
   void initState() {
@@ -72,8 +72,8 @@ class _BottomDialogWrapperState<T> extends State<BottomDialogWrapper>
         duration: Duration(milliseconds: widget.duration),
         vsync: this); //AnimationController
     _animation = ColorTween(begin: Color(0x00000000), end: widget.barrierColor)
-        .animate(_animationController);
-    animationController.addStatusListener(_handleStatusChange);
+        .animate(_animationController!);
+    animationController!.addStatusListener(_handleStatusChange);
 
     /// 执行出现动画
     _insert();
@@ -101,9 +101,9 @@ class _BottomDialogWrapperState<T> extends State<BottomDialogWrapper>
                   color: _animation.value,
                 ),
                 onTap: () {
-                  T result;
+                  T? result;
                   if (widget.exitCallBack != null) {
-                    result = widget.exitCallBack();
+                    result = widget.exitCallBack!() as T?;
                   }
                   remove(result);
                 },
@@ -131,30 +131,30 @@ class _BottomDialogWrapperState<T> extends State<BottomDialogWrapper>
   Widget _buildAnimationChild(
       BuildContext context, BoxConstraints constraints) {
     return AnimatedBuilder(
-      animation: _animationController,
+      animation: _animationController!,
       builder: (context, child) {
         return Transform.translate(
           offset: Offset(
               0,
               widget.transformHeight -
-                  _animationController.value * widget.transformHeight),
+                  _animationController!.value * widget.transformHeight),
           child: child,
         );
       },
       child: BottomDragWrapper(
         builder: (context) {
           return widget.child == null
-              ? widget.buildChild(context)
-              : widget.child;
+              ? widget.buildChild!(context)
+              : widget.child!;
         },
         enableDrag: widget.enableDrag,
         animationController: _animationController,
         onDragStart: _handleDragStart,
         onDragEnd: _handleDragEnd,
         onClosing: () {
-          T result;
+          T? result;
           if (widget.exitCallBack != null) {
-            result = widget.exitCallBack();
+            result = widget.exitCallBack!() as T?;
           }
           remove(result);
         },
@@ -165,18 +165,18 @@ class _BottomDialogWrapperState<T> extends State<BottomDialogWrapper>
 
   /// 开始执行出现动画
   void _insert() {
-    _animationController.forward();
+    _animationController!.forward();
   }
 
   /// 动画方式关闭自己
-  void remove([T result]) {
-    _animationController
+  void remove([T? result]) {
+    _animationController!
         .reverse()
         .then((_) => Navigator.of(context).pop(result));
   }
 
   /// 关闭自己 同remove
-  void popSelf([T result]) {
+  void popSelf([T? result]) {
     remove(result);
   }
 
@@ -184,7 +184,7 @@ class _BottomDialogWrapperState<T> extends State<BottomDialogWrapper>
   void _handleDragStart(DragStartDetails details) {}
 
   /// 拖动结束处理
-  void _handleDragEnd(DragEndDetails details, {bool isClosing}) {}
+  void _handleDragEnd(DragEndDetails details, {bool? isClosing}) {}
 
   /// 动画状态有变化
   void _handleStatusChange(AnimationStatus status) {}
@@ -196,20 +196,20 @@ const double _closeProgressThreshold = 0.5;
 /// 底部框拖动事件处理 参考系统的bottomSheet
 class BottomDragWrapper extends StatefulWidget {
   const BottomDragWrapper({
-    Key key,
+    Key? key,
     this.animationController,
-    this.enableDrag,
+    required this.enableDrag,
     this.onDragStart,
     this.onDragEnd,
-    @required this.onClosing,
-    @required this.builder,
+    required this.onClosing,
+    required this.builder,
     this.dragScrollDep,
   })  : assert(enableDrag != null),
         assert(onClosing != null),
         assert(builder != null),
         super(key: key);
 
-  final AnimationController animationController;
+  final AnimationController? animationController;
 
   final VoidCallback onClosing;
 
@@ -217,11 +217,11 @@ class BottomDragWrapper extends StatefulWidget {
 
   final bool enableDrag;
 
-  final BottomSheetDragStartHandler onDragStart;
+  final BottomSheetDragStartHandler? onDragStart;
 
-  final BottomSheetDragEndHandler onDragEnd;
+  final BottomSheetDragEndHandler? onDragEnd;
 
-  final int dragScrollDep;
+  final int? dragScrollDep;
 
   @override
   _BottomDragWrapperState createState() => _BottomDragWrapperState();
@@ -234,24 +234,24 @@ class _BottomDragWrapperState extends State<BottomDragWrapper> {
 
   double get _childHeight {
     final RenderBox renderBox =
-        _childKey.currentContext.findRenderObject() as RenderBox;
+        _childKey.currentContext!.findRenderObject() as RenderBox;
     return renderBox.size.height;
   }
 
   bool get _dismissUnderway =>
-      widget.animationController.status == AnimationStatus.reverse;
+      widget.animationController!.status == AnimationStatus.reverse;
 
   void _handleDragStart(DragStartDetails details) {
     if (widget.onDragStart != null) {
-      widget.onDragStart(details);
+      widget.onDragStart!(details);
     }
   }
 
   void _handleDragUpdate(DragUpdateDetails details) {
     assert(widget.enableDrag);
     if (_dismissUnderway) return;
-    widget.animationController.value -=
-        details.primaryDelta / (_childHeight ?? details.primaryDelta);
+    widget.animationController!.value -=
+        details.primaryDelta! / (_childHeight);
   }
 
   void _handleDragEnd(DragEndDetails details) {
@@ -261,22 +261,22 @@ class _BottomDragWrapperState extends State<BottomDragWrapper> {
     if (details.velocity.pixelsPerSecond.dy > _minFlingVelocity) {
       final double flingVelocity =
           -details.velocity.pixelsPerSecond.dy / _childHeight;
-      if (widget.animationController.value > 0.0) {
-        widget.animationController.fling(velocity: flingVelocity);
+      if (widget.animationController!.value > 0.0) {
+        widget.animationController!.fling(velocity: flingVelocity);
       }
       if (flingVelocity < 0.0) {
         isClosing = true;
       }
-    } else if (widget.animationController.value < _closeProgressThreshold) {
-      if (widget.animationController.value > 0.0)
-        widget.animationController.fling(velocity: -1.0);
+    } else if (widget.animationController!.value < _closeProgressThreshold) {
+      if (widget.animationController!.value > 0.0)
+        widget.animationController!.fling(velocity: -1.0);
       isClosing = true;
     } else {
-      widget.animationController.forward();
+      widget.animationController!.forward();
     }
 
     if (widget.onDragEnd != null) {
-      widget.onDragEnd(
+      widget.onDragEnd!(
         details,
         isClosing: isClosing,
       );
@@ -296,7 +296,7 @@ class _BottomDragWrapperState extends State<BottomDragWrapper> {
 
   bool scrollChanged(ScrollNotification notification) {
     if (notification.depth == widget.dragScrollDep &&
-        (notification.metrics?.pixels ?? -1) == 0 && (notification.metrics?.atEdge ?? false)) {
+        (notification.metrics.pixels) == 0 && (notification.metrics.atEdge)) {
       _enableDragHook = true;
     }
     return false;

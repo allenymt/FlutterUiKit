@@ -39,10 +39,10 @@ class PreloadPageView extends StatefulWidget {
   /// child that could possibly be displayed in the page view, instead of just
   /// those children that are actually visible.
   PreloadPageView({
-    Key key,
+    Key? key,
     this.scrollDirection = Axis.horizontal,
     this.reverse = false,
-    PageController controller,
+    PageController? controller,
     this.physics,
     this.pageSnapping = true,
     this.onPageChanged,
@@ -67,15 +67,15 @@ class PreloadPageView extends StatefulWidget {
   ///
   /// You can add [preloadPagesCount] for PreloadPageView if you want preload multiple pages
   PreloadPageView.builder({
-    Key key,
+    Key? key,
     this.scrollDirection = Axis.horizontal,
     this.reverse = false,
-    PageController controller,
+    PageController? controller,
     this.physics,
     this.pageSnapping = true,
     this.onPageChanged,
-    @required IndexedWidgetBuilder itemBuilder,
-    int itemCount,
+    required IndexedWidgetBuilder itemBuilder,
+    int? itemCount,
     this.preloadPagesCount = 1,
   })  : controller = controller ?? _defaultPageController,
         childrenDelegate =
@@ -85,14 +85,14 @@ class PreloadPageView extends StatefulWidget {
   /// Creates a scrollable list that works page by page with a custom child
   /// model.
   PreloadPageView.custom({
-    Key key,
+    Key? key,
     this.scrollDirection = Axis.horizontal,
     this.reverse = false,
-    PageController controller,
+    PageController? controller,
     this.physics,
     this.pageSnapping = true,
     this.onPageChanged,
-    @required this.childrenDelegate,
+    required this.childrenDelegate,
     this.preloadPagesCount = 1,
   })  : assert(childrenDelegate != null),
         controller = controller ?? _defaultPageController,
@@ -130,13 +130,13 @@ class PreloadPageView extends StatefulWidget {
   /// [PageScrollPhysics] prior to being used.
   ///
   /// Defaults to matching platform conventions.
-  final ScrollPhysics physics;
+  final ScrollPhysics? physics;
 
   /// Set to false to disable page snapping, useful for custom scroll behavior.
   final bool pageSnapping;
 
   /// Called whenever the page in the center of the viewport changes.
-  final ValueChanged<int> onPageChanged;
+  final ValueChanged<int>? onPageChanged;
 
   /// A delegate that provides the children for the [PreloadPageView].
   ///
@@ -181,7 +181,7 @@ class _PreloadPageViewState extends State<PreloadPageView> {
     }
   }
 
-  AxisDirection _getDirection(BuildContext context) {
+  AxisDirection? _getDirection(BuildContext context) {
     switch (widget.scrollDirection) {
       case Axis.horizontal:
         assert(debugCheckHasDirectionality(context));
@@ -199,8 +199,8 @@ class _PreloadPageViewState extends State<PreloadPageView> {
 
   @override
   Widget build(BuildContext context) {
-    final AxisDirection axisDirection = _getDirection(context);
-    final ScrollPhysics physics = widget.pageSnapping
+    final AxisDirection axisDirection = _getDirection(context)!;
+    final ScrollPhysics? physics = widget.pageSnapping
         ? _kPagePhysics.applyTo(widget.physics)
         : widget.physics;
 
@@ -209,11 +209,11 @@ class _PreloadPageViewState extends State<PreloadPageView> {
         if (notification.depth == 0 &&
             widget.onPageChanged != null &&
             notification is ScrollUpdateNotification) {
-          final PageMetrics metrics = notification.metrics;
-          final int currentPage = metrics.page.round();
+          final PageMetrics metrics = notification.metrics as PageMetrics;
+          final int currentPage = metrics.page!.round();
           if (currentPage != _lastReportedPage) {
             _lastReportedPage = currentPage;
-            widget.onPageChanged(currentPage);
+            widget.onPageChanged!(currentPage);
           }
         }
         return false;

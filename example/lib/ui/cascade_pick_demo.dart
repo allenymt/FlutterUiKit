@@ -50,7 +50,7 @@ class CascadePickDemo extends StatelessWidget {
       body: CascadeSelectWidget<int>(
           columnNum: 3,
           buildPickData: (columnIndex, int lastColumnIndex) {
-            List<int> result;
+            List<int>? result;
             if (columnIndex == 0) {
               result = one;
             } else if (columnIndex == 1) {

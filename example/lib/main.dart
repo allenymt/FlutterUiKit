@@ -96,7 +96,7 @@ class _WidgetDemoPageListState extends State<WidgetDemoPageList> {
             },
           ),
           ListTile(
-            title: Text('折叠文本demo'),
+            title: Text('测试布局demo'),
             onTap: () {
               Navigator.of(context).push(MaterialPageRoute(builder: (context) {
                 return Scaffold(
@@ -146,22 +146,22 @@ class DialogRoute extends PopupRoute {
     this.barrierColor,
     this.barrierLabel,
     this.builder,
-    bool semanticsDismissible,
-    RouteSettings settings,
+    bool? semanticsDismissible,
+    RouteSettings? settings,
   }) : super(
           settings: settings,
         ) {
     _semanticsDismissible = semanticsDismissible;
   }
 
-  final WidgetBuilder builder;
-  bool _semanticsDismissible;
+  final WidgetBuilder? builder;
+  bool? _semanticsDismissible;
 
   @override
-  final String barrierLabel;
+  final String? barrierLabel;
 
   @override
-  final Color barrierColor;
+  final Color? barrierColor;
 
   @override
   bool get barrierDismissible => true;
@@ -175,6 +175,6 @@ class DialogRoute extends PopupRoute {
   @override
   Widget buildPage(BuildContext context, Animation<double> animation,
       Animation<double> secondaryAnimation) {
-    return builder(context);
+    return builder!(context);
   }
 }

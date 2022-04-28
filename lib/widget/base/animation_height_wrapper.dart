@@ -11,19 +11,19 @@ import 'package:flutter/material.dart';
 class AnimationHeightViewWidget<T extends Widget> extends StatefulWidget {
   T pageViewChild;
 
-  final double Function(int currentIndex) computeAspectRadio;
+  final double Function(int? currentIndex) computeAspectRadio;
 
-  final Function(ScrollNotification scrollNotification) notifyScroll;
+  final Function(ScrollNotification scrollNotification)? notifyScroll;
 
   final int itemCount;
 
-  final int currentPageIndex;
+  final int? currentPageIndex;
 
   AnimationHeightViewWidget(
-      {this.pageViewChild,
-      this.computeAspectRadio,
+      {required this.pageViewChild,
+      required this.computeAspectRadio,
       this.notifyScroll,
-      this.itemCount,
+      required this.itemCount,
       this.currentPageIndex})
       : assert(pageViewChild != null),
         assert(computeAspectRadio != null),
@@ -36,19 +36,19 @@ class AnimationHeightViewWidget<T extends Widget> extends StatefulWidget {
 }
 
 class _AnimationHeightViewWidgetState extends State<AnimationHeightViewWidget> {
-  StreamController<double> _streamController;
-  Stream<double> _headerStream;
+  StreamController<double>? _streamController;
+  Stream<double>? _headerStream;
 
-  List<double> _hisAspectRadioList;
+  late List<double> _hisAspectRadioList;
 
-  int _currentIndex = 0;
+  int? _currentIndex = 0;
 
   @override
   void initState() {
     super.initState();
     _hisAspectRadioList = List.filled(widget.itemCount, 0);
     _streamController = StreamController.broadcast();
-    _headerStream = _streamController.stream;
+    _headerStream = _streamController!.stream;
   }
 
   @override
@@ -59,12 +59,12 @@ class _AnimationHeightViewWidgetState extends State<AnimationHeightViewWidget> {
 
   @override
   Widget build(BuildContext context) {
-    Widget child = StreamBuilder(
+    Widget child = StreamBuilder<double>(
       stream: _headerStream,
       builder: (context, snapshot) {
         return AspectRatio(
           aspectRatio:
-              snapshot?.data ?? widget.computeAspectRadio(_currentIndex) ?? 1.0,
+              snapshot.data ?? widget.computeAspectRadio(_currentIndex),
           child: widget.pageViewChild,
         );
       },
@@ -73,7 +73,7 @@ class _AnimationHeightViewWidgetState extends State<AnimationHeightViewWidget> {
       child: child,
       onNotification: (scrollNotification) {
         if (widget.notifyScroll != null) {
-          widget?.notifyScroll(scrollNotification);
+          widget.notifyScroll!(scrollNotification);
         }
         if (scrollNotification.depth == 0)
           _computeRadioToRadio(scrollNotification);
@@ -90,7 +90,7 @@ class _AnimationHeightViewWidgetState extends State<AnimationHeightViewWidget> {
   }
 
   void _computeRadioToRadio(ScrollNotification scroll) {
-    int beforeIndex = _currentIndex;
+    int beforeIndex = _currentIndex!;
     int nextIndex;
 
     //选中态左边界
@@ -125,7 +125,7 @@ class _AnimationHeightViewWidgetState extends State<AnimationHeightViewWidget> {
 //            beforeIndex * scroll.metrics.viewportDimension)
 //            .abs() /
 //            scroll.metrics.viewportDimension)}");
-    _streamController.add(animationValue);
+    _streamController!.add(animationValue);
   }
 
   double getRadio(int index) {

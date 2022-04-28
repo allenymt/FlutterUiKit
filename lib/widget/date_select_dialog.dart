@@ -26,15 +26,15 @@ class _DateSelectState extends State<DateSelectDialog> {
   final int minDay = 1;
 
   /// 取当前年份
-  int _maxYear;
+  late int _maxYear;
 
-  int _currentYear;
-  int _currentMonth;
-  int _currentDay;
+  int? _currentYear;
+  int? _currentMonth;
+  int? _currentDay;
 
-  List<int> yearList = [];
-  List<int> monthList = [];
-  List<int> dayList = [];
+  List<int?> yearList = [];
+  List<int?> monthList = [];
+  List<int?> dayList = [];
 
   @override
   void initState() {
@@ -64,12 +64,12 @@ class _DateSelectState extends State<DateSelectDialog> {
               GestureDetector(
                 child: _buildTitleBtn("完成"),
                 onTap: () {
-                  List<int> _resultList = [
+                  List<int?> _resultList = [
                     _currentYear,
                     _currentMonth,
                     _currentDay
                   ];
-                  Navigator.of(context).pop(_resultList?.join("-") ?? "");
+                  Navigator.of(context).pop(_resultList.join("-"));
                 },
               ),
             ],
@@ -81,7 +81,7 @@ class _DateSelectState extends State<DateSelectDialog> {
             flex: 1,
             child: Container(
               margin: EdgeInsets.only(left: 18, right: 18),
-              child: CascadeSelectWidget<int>(
+              child: CascadeSelectWidget<int?>(
                   columnNum: 3,
                   initIndex: _buildInitIndex(),
                   pickerStyle: PickerStyle.defaultStyle()
@@ -93,7 +93,7 @@ class _DateSelectState extends State<DateSelectDialog> {
                     return _buildColumnData(columnIndex, lastColumnIndex);
                   },
                   resultCallback: (resultList) {
-                    if ((resultList?.length ?? 0) >= 3) {
+                    if ((resultList.length) >= 3) {
                       _currentYear = resultList[0];
                       _currentMonth = resultList[1];
                       _currentDay = resultList[2];
@@ -123,7 +123,7 @@ class _DateSelectState extends State<DateSelectDialog> {
     return [indexYear, indexMonth, indexDay];
   }
 
-  List<int> _buildColumnData(int columnIndex, int lastColumnIndex) {
+  List<int?> _buildColumnData(int columnIndex, int lastColumnIndex) {
     if (columnIndex == 0) {
       return yearList;
     } else if (columnIndex == 1) {
@@ -170,17 +170,17 @@ class _DateSelectState extends State<DateSelectDialog> {
   void _getCurrentDate() {
     DateTime nowTime = DateTime.now();
     _currentYear = nowTime.year;
-    _maxYear = _currentYear + 20;
+    _maxYear = _currentYear! + 20;
     _currentMonth = nowTime.month;
     _currentDay = nowTime.day;
   }
 
   /*根据年份月份获取当前月有多少天*/
-  int _getDaysNum(int y, int m) {
+  int _getDaysNum(int? y, int? m) {
     if (m == 1 || m == 3 || m == 5 || m == 7 || m == 8 || m == 10 || m == 12) {
       return 31;
     } else if (m == 2) {
-      if (((y % 4 == 0) && (y % 100 != 0)) || (y % 400 == 0)) {
+      if (((y! % 4 == 0) && (y % 100 != 0)) || (y % 400 == 0)) {
         //闰年 2月29
         return 29;
       } else {
