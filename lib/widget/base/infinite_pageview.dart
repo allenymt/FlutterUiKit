@@ -125,7 +125,7 @@ class InfinitePageViewState extends State<InfinitePageView> with WidgetsBindingO
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance!.addObserver(this);
+    WidgetsBinding.instance?.addObserver(this);
     _isActive = true;
     startAutoPlay();
     _innerPageIndex = cycleRolling ? widget.initIndex + 1 : widget.initIndex;
@@ -212,7 +212,7 @@ class InfinitePageViewState extends State<InfinitePageView> with WidgetsBindingO
   void dispose() {
     _pageController?.dispose();
     cancelAutoPlay();
-    WidgetsBinding.instance!.removeObserver(this);
+    WidgetsBinding.instance?.removeObserver(this);
     super.dispose();
   }
 
@@ -238,7 +238,7 @@ class InfinitePageViewState extends State<InfinitePageView> with WidgetsBindingO
     if (itemCount <= 1) return;
     //参考RestartableTimer的写法
     if (_autoPlayTimer == null && cycleRolling) {
-      SchedulerBinding.instance!.addPostFrameCallback((timeStamp) {
+      SchedulerBinding.instance?.addPostFrameCallback((timeStamp) {
         _autoPlayTimer = Timer.periodic(
             Duration(seconds: widget.autoPlaySeconds),
             (timer) {
@@ -279,7 +279,7 @@ class InfinitePageViewState extends State<InfinitePageView> with WidgetsBindingO
     debugLog("autoMoveToNextIndex $_innerPageIndex");
     if (_innerPageIndex == 0) {
       this._pageController!.jumpToPage(_innerPageIndex + 1);
-      SchedulerBinding.instance!.addPostFrameCallback((timeStamp) {
+      SchedulerBinding.instance?.addPostFrameCallback((timeStamp) {
         autoMoveToNextIndex();
         setState(() {});
       });
